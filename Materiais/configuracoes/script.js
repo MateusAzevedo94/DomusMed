@@ -1237,23 +1237,40 @@ function setupToolsListeners() {
 // ============================
 
 /**
- * Aplica cache bust em todas as imagens com ID
- * Previne problemas de cache em imagens externas
+ * Aplica cache bust em todas as imagens e habilita zoom em modal
  */
-function applyCacheBust() {
-  const images = document.querySelectorAll('img[id]');
-  
+document.addEventListener("DOMContentLoaded", () => {
+  const images = document.querySelectorAll("img");
+
+  // cria modal de zoom
+  const modal = document.createElement("div");
+  modal.classList.add("modal");
+  modal.innerHTML = "<img>";
+  document.body.appendChild(modal);
+  const modalImg = modal.querySelector("img");
+
   images.forEach(img => {
-    if (img.src && !img.src.includes('?t=')) {
-      const separator = img.src.includes('?') ? '&' : '?';
-      img.src = img.src + separator + 't=' + new Date().getTime();
-      console.log('Cache bust aplicado à imagem:', img.id);
+    // 1) Cache bust -> sempre força carregar a versão mais recente
+    if (img.src && !img.src.includes("?t=")) {
+      const separator = img.src.includes("?") ? "&" : "?";
+      img.src = img.src + separator + "t=" + new Date().getTime();
+    }
+
+    // 2) Zoom modal -> apenas para imagens de estudo
+    if (img.classList.contains("estudo-img")) {
+      img.style.cursor = "zoom-in";
+      img.addEventListener("click", () => {
+        modalImg.src = img.src;
+        modal.style.display = "flex";
+      });
     }
   });
-}
 
-// Executa após carregar a página
-window.addEventListener('load', applyCacheBust);
+  // Fecha modal ao clicar
+  modal.addEventListener("click", () => {
+    modal.style.display = "none";
+  });
+});
 
 // ============================
 // CRIAÇÃO DINÂMICA DE ELEMENTOS DE INTERFACE
