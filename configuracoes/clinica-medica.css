@@ -1,0 +1,544 @@
+/* ============================
+   ESTILOS GERAIS DO DOCUMENTO
+   ============================ */
+
+/* Reset básico e configurações globais */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Garamond', serif;
+  background-color: #ffffff;
+  color: #2c2c2c;
+  margin: 40px;
+  line-height: 1.2;
+  font-size: 20px;
+  transition: margin-left 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Configuração responsiva para dispositivos móveis */
+@media (max-width: 768px) {
+  body {
+    margin: 20px;
+    font-size: 18px;
+  }
+}
+
+/* ============================
+   TIPOGRAFIA E TÍTULOS
+   ============================ */
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Garamond', serif;
+}
+
+/* Título principal da página */
+h1 {
+  display: block;
+  font-size: 2.2em;
+  font-weight: bold;
+  text-align: center;
+  color: #1f2b45;
+  margin-bottom: 0.6em;
+  letter-spacing: 0.5px;
+  border-bottom: 3px solid #99badd;
+  padding: 0.2em 0.6em;
+  border-radius: 4px;
+}
+
+/* Títulos de seção principal */
+h2 {
+  font-size: 1.8em;
+  text-align: center;
+  color: #2e3a59;
+  border-bottom: 2px solid #ccc;
+  padding-bottom: 0.3em;
+  margin-bottom: 0.4em;
+}
+
+/* Subtítulos de seção */
+h3 {
+  font-size: 1.6em;
+  margin-top: 1.5em;
+  margin-bottom: 0.4em;
+  color: #2e3a59;
+  border-left: 5px solid #99badd;
+  padding-left: 0.5em;
+  display: inline-block;
+  border-bottom: 2px solid #99badd;
+}
+
+/* Subtítulos de subseção */
+h4 {
+  font-size: 1.4em;
+  margin-top: 1em;
+  margin-bottom: 0.3em;
+  color: #444;
+  position: relative;
+  padding-left: 1em;
+  display: block;
+  width: fit-content;
+  border-bottom: 1px solid #ccc;
+}
+
+h4::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 3px;
+  background-color: #888;
+  border-radius: 1px;
+}
+
+/* Títulos menores */
+h5 {
+  font-size: 1.2em;
+  margin-top: 1em;
+  margin-bottom: 0.3em;
+  color: #444;
+}
+
+h6 {
+  font-size: 1em;
+  margin-top: 0.4em;
+  margin-bottom: 0.0em;
+  font-weight: bold;
+  color: #333;
+}
+
+h6 + p {
+  margin-top: 0.2em;
+}
+
+/* ============================
+   IMAGEM DE CAPA
+   ============================ */
+
+#capa {
+  display: block;
+  margin: 0 auto;
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 50px;
+}
+
+/* ============================
+   IMAGENS DO CORPO DO TEXTO
+   ============================ */
+
+.estudo-img {
+  display: block;
+  margin: 2em auto;
+  max-width: 60%;
+  height: auto;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.estudo-img:hover {
+  transform: scale(1.02);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+/* Responsividade para imagens do corpo */
+@media (max-width: 768px) {
+  .estudo-img {
+    max-width: 90%;
+    margin: 1.5em auto;
+  }
+}
+
+/* ============================
+   MODAL PARA IMAGENS
+   ============================ */
+
+.image-modal {
+  display: none;
+  position: fixed;
+  z-index: 10000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.9);
+  cursor: pointer;
+}
+
+.image-modal img {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 95%;
+  max-height: 95%;
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+/* ============================
+   ELEMENTOS DE DESTAQUE
+   ============================ */
+
+.destaque {
+  background-color: #e3f0fa;
+  border-left: 8px solid #5a9bd3;
+  padding: 1.2em 1.5em;
+  margin: 2em 0;
+  font-style: italic;
+  box-shadow: 2px 2px 5px rgba(0,0,0,0.05);
+  margin-left: 3em;
+  border-radius: 4px;
+}
+
+@media (max-width: 768px) {
+  .destaque {
+    margin-left: 1em;
+    padding: 1em;
+  }
+}
+
+/* ============================
+   TABELAS
+   ============================ */
+
+.tabela-container {
+  overflow-x: auto;
+  max-width: 100%;
+  margin: 1.5em 0;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+table {
+  table-layout: auto;
+  border-collapse: collapse;
+  width: 100%;
+  max-width: 100%;
+  font-size: 20px;
+  background-color: #fff;
+}
+
+th, td {
+  border: 1px solid #aaa;
+  padding: 0.7em;
+  text-align: left;
+  white-space: normal;
+  word-break: break-word;
+}
+
+th {
+  background-color: #dbe6f1;
+  font-weight: bold;
+}
+
+@media (max-width: 768px) {
+  table {
+    font-size: 16px;
+  }
+  
+  th, td {
+    padding: 0.5em;
+  }
+}
+
+/* ============================
+   LISTAS
+   ============================ */
+
+ul {
+  margin-top: 0.5em;
+  padding-left: 1.5em;
+}
+
+li {
+  margin-bottom: 0.3em;
+}
+
+/* ============================
+   MODO ESCURO
+   ============================ */
+
+body.dark-mode {
+  background-color: #1a1a1a;
+  color: #e0e0e0;
+}
+
+body.dark-mode h1,
+body.dark-mode h2,
+body.dark-mode h3,
+body.dark-mode h4,
+body.dark-mode h5,
+body.dark-mode h6 {
+  color: #f0f0f0;
+}
+
+body.dark-mode .destaque {
+  background-color: #2a3a4a;
+  border-left-color: #5a9bd3;
+  color: #e0e0e0;
+}
+
+body.dark-mode table {
+  background-color: #2a2a2a;
+  color: #e0e0e0;
+}
+
+body.dark-mode th {
+  background-color: #3a4a5a;
+}
+
+body.dark-mode td {
+  border-color: #555;
+}
+
+body.dark-mode th {
+  border-color: #555;
+}
+
+body.dark-mode .image-modal {
+  background-color: rgba(0, 0, 0, 0.95);
+}
+
+/* ============================
+   SIDEBAR DO SUMÁRIO
+   ============================ */
+
+#sidebar {
+  position: fixed;
+  top: 0;
+  left: -400px;
+  min-width: 200px;
+  width: max-content;
+  max-width: 300px;
+  overflow-x: auto;
+  height: 100%;
+  background: #f9f9f9;
+  border-right: 2px solid #ccc;
+  box-shadow: 2px 0 5px rgba(0,0,0,0.2);
+  padding: 120px 20px 20px 20px;
+  overflow-y: auto;
+  transition: left 0.3s ease;
+  z-index: 10000;
+  white-space: nowrap;
+}
+
+#sidebar.active {
+  left: 0;
+}
+
+#sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+#sidebar li {
+  margin: 8px 0;
+}
+
+#sidebar a {
+  text-decoration: none;
+  color: #2e3a59;
+  transition: color 0.2s;
+  display: block;
+  padding: 4px 0;
+  border-radius: 4px;
+}
+
+#sidebar a:hover {
+  color: #5a9bd3;
+  background-color: rgba(90, 155, 211, 0.1);
+  padding-left: 8px;
+}
+
+@media (max-width: 768px) {
+  #sidebar {
+    max-width: 250px;
+    padding: 100px 15px 15px 15px;
+  }
+}
+
+/* ============================
+   BOTÃO FLUTUANTE DO SUMÁRIO
+   ============================ */
+
+#toggle-btn {
+  position: fixed;
+  top: 50px;
+  left: 15px;
+  background-color: #f0f0f0;
+  color: black;
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  padding: 10px;
+  cursor: pointer;
+  z-index: 10001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Garamond', serif;
+  font-size: 18px;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  width: 40px;
+  height: 40px;
+  gap: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+#toggle-btn .icon {
+  font-size: 18px;
+  display: inline-block;
+  transition: transform 0.3s ease;
+}
+
+#toggle-btn .label {
+  display: none;
+  white-space: nowrap;
+  color: black;
+  font-weight: 500;
+}
+
+#toggle-btn:hover {
+  width: 120px;
+  background-color: #e0e0e0;
+}
+
+#toggle-btn:hover .label {
+  display: inline-block;
+}
+
+#toggle-btn:hover .icon {
+  transform: rotate(90deg);
+}
+
+@media (max-width: 768px) {
+  #toggle-btn {
+    top: 20px;
+    left: 10px;
+  }
+}
+
+/* ============================
+   BARRA DE PROGRESSO DE LEITURA
+   ============================ */
+
+#progress-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 25px;
+  background-color: #f0f0f0;
+  display: flex;
+  align-items: center;
+  font-family: 'Garamond', serif;
+  overflow: hidden;
+  z-index: 9999;
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2);
+  border-top: 1px solid #ddd;
+}
+
+#reading-time {
+  width: 260px;
+  padding-left: 10px;
+  font-size: 16px;
+  color: #2e3a59;
+  flex-shrink: 0;
+  font-weight: 500;
+}
+
+#progress-bar {
+  height: 100%;
+  background-color: #5a9bd3;
+  text-align: right;
+  line-height: 25px;
+  color: black;
+  padding-right: 10px;
+  transition: width 0.2s ease, background-color 0.2s ease;
+  width: 0%;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+#progress-bar.complete {
+  background-color: #4caf50;
+  color: white;
+}
+
+@media (max-width: 768px) {
+  #reading-time {
+    width: 200px;
+    font-size: 14px;
+    padding-left: 8px;
+  }
+  
+  #progress-bar {
+    font-size: 12px;
+    padding-right: 8px;
+  }
+}
+
+/* ============================
+   OVERLAY PARA SIDEBAR EM MOBILE
+   ============================ */
+
+#sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 9999;
+  display: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+#sidebar-overlay.active {
+  display: block;
+  opacity: 1;
+}
+
+@media (min-width: 769px) {
+  #sidebar-overlay {
+    display: none !important;
+  }
+}
+
+/* ============================
+   ANIMAÇÕES E TRANSIÇÕES
+   ============================ */
+
+.fade-in {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+#toggle-btn:active {
+  transform: scale(0.95);
+}
+
+.loading {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
