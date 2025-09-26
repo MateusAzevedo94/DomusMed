@@ -203,21 +203,23 @@ function openImageModal(imageSrc, imageAlt) {
   const separator = imageSrc.includes('?') ? '&' : '?';
   const cacheBustedSrc = imageSrc + separator + 't=' + timestamp;
   
-  modalImg.src = cacheBustedSrc;
-  modalImg.alt = imageAlt || 'Imagem em tela cheia';
-  
-  // Mostra modal
-  overlay.style.display = 'block';
-  modal.style.display = 'block';
-  document.body.style.overflow = 'hidden';
-  
-  setTimeout(() => {
-    overlay.classList.add('active');
-    modal.classList.add('active');
-  }, 10);
-  
-  console.log('Modal de imagem aberto:', cacheBustedSrc);
-}
+// Define a imagem no modal e limpa restrições
+modalImg.src = cacheBustedSrc;
+modalImg.removeAttribute("style");
+modalImg.removeAttribute("width");
+modalImg.removeAttribute("height");
+
+// Mostra modal
+overlay.style.display = 'block';
+modal.style.display = 'block';
+document.body.style.overflow = 'hidden';
+
+setTimeout(() => {
+  overlay.classList.add('active');
+  modal.classList.add('active');
+}, 10);
+
+console.log('Modal de imagem aberto:', cacheBustedSrc);
 
 /**
  * Fecha o modal de visualização de imagem
