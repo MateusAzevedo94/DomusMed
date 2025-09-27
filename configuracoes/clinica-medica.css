@@ -231,7 +231,6 @@ h6 + p {
 
 .image-modal.active {
   opacity: 1;
-  transform: translate(-50%, -50%) scale(1);
 }
 
 .image-modal img {
