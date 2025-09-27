@@ -484,955 +484,113 @@ function getPlatformDisplayName(platform) {
 /**
  * Mostra notificação temporária
  */
-function showNotification(message) {
-  // Remove notificação existente
-  const existingNotification = document.querySelector('.ai-notification');
-  if (existingNotification) {
-    existingNotification.remove();
-  }
-
+function showNotification(message, type = 'success') {
   const notification = document.createElement('div');
-  notification.className = 'ai-notification';
+  notification.className = `notification ${type}`;
   notification.textContent = message;
+  
   document.body.appendChild(notification);
-
-  // Remove após 3 segundos
+  
   setTimeout(() => {
-    if (notification.parentNode) {
-      notification.remove();
-    }
+    notification.classList.add('show');
+  }, 100);
+  
+  setTimeout(() => {
+    notification.classList.remove('show');
+    setTimeout(() => {
+      if (notification.parentNode) {
+        notification.parentNode.removeChild(notification);
+      }
+    }, 300);
   }, 3000);
 }
 
 /**
- * Lida com seleção de texto na página
+ * Captura seleção de texto
  */
-function handleTextSelection() {
+function captureTextSelection() {
   const selection = window.getSelection();
-  const text = selection.toString().trim();
-  
-  if (text.length > 0) {
-    selectedText = text;
-    updateSelectedTextDisplay();
-  }
+  selectedText = selection.toString().trim();
+  console.log('Texto selecionado capturado:', selectedText);
 }
 
 /**
- * Atualiza a exibição do texto selecionado no modal
+ * Configura event listeners para seleção de texto
  */
-function updateSelectedTextDisplay() {
-  const container = document.getElementById('selected-text-container');
-  const textDiv = document.getElementById('selected-text');
-  
-  if (container && textDiv) {
-    if (selectedText) {
-      textDiv.textContent = selectedText;
-      container.style.display = 'block';
-    } else {
-      container.style.display = 'none';
-    }
-  }
-}
-
-/**
- * Alterna entre plataformas
- */
-function switchPlatform(platform) {
-  currentPlatform = platform;
-  
-  // Atualiza botões de plataforma
-  const platformButtons = document.querySelectorAll('.platform-btn');
-  platformButtons.forEach(btn => {
-    const btnPlatform = btn.getAttribute('data-platform');
-    btn.classList.toggle('active', btnPlatform === platform);
-  });
-}
-
-/**
- * Processa pergunta (pré-formulada ou personalizada)
- */
-function processQuestion(question) {
-  openAIPlatform(currentPlatform, question);
-}
-
-/**
- * Cria botões de plataformas de IA
- */
-function createPlatformButtons() {
-  const container = document.querySelector('.platform-buttons');
-  if (!container) return;
-
-  container.innerHTML = '';
-
-  const platforms = [
-    { id: 'chatgpt', name: 'ChatGPT' },
-    { id: 'openevidence', name: 'OpenEvidence' },
-    { id: 'consensus', name: 'Consensus' },
-    { id: 'perplexity', name: 'Perplexity' }
-  ];
-
-  platforms.forEach(platform => {
-    const button = document.createElement('button');
-    button.className = 'platform-btn';
-    button.setAttribute('data-platform', platform.id);
-    button.textContent = platform.name;
-    
-    button.addEventListener('click', () => switchPlatform(platform.id));
-    
-    container.appendChild(button);
-  });
-}
-
-/**
- * Cria botões de perguntas pré-formuladas
- */
-function createPredefinedQuestionButtons() {
-  const container = document.getElementById('questions-container');
-  if (!container) return;
-
-  container.innerHTML = '';
-
-  PREDEFINED_QUESTIONS.forEach((question, index) => {
-    const button = document.createElement('button');
-    button.className = 'question-btn';
-    button.textContent = question.short;
-    button.title = question.detailed;
-    
-    button.addEventListener('click', () => {
-      processQuestion(question.detailed);
-    });
-    
-    container.appendChild(button);
-  });
-}
-
-/**
- * Abre o modal do assistente IA
- */
-function openAIModal() {
-  const modal = document.getElementById('ai-modal');
-  const overlay = document.getElementById('ai-modal-overlay');
-  
-  if (modal && overlay) {
-    modal.style.display = 'block';
-    overlay.style.display = 'block';
-    document.body.style.overflow = 'hidden';
-    
-    // Atualiza texto selecionado
-    updateSelectedTextDisplay();
-    
-    setTimeout(() => {
-      modal.classList.add('active');
-      overlay.classList.add('active');
-    }, 10);
-  }
-}
-
-/**
- * Fecha o modal do assistente IA
- */
-function closeAIModal() {
-  const modal = document.getElementById('ai-modal');
-  const overlay = document.getElementById('ai-modal-overlay');
-  
-  if (modal && overlay) {
-    modal.classList.remove('active');
-    overlay.classList.remove('active');
-    
-    setTimeout(() => {
-      modal.style.display = 'none';
-      overlay.style.display = 'none';
-      document.body.style.overflow = '';
-    }, 300);
-  }
-}
-
-/**
- * Configura event listeners do assistente IA
- */
-function setupAIEventListeners() {
-  // Botão principal do assistente IA
-  const aiBtn = document.getElementById('ai-assistant-btn');
-  if (aiBtn) {
-    aiBtn.addEventListener('click', openAIModal);
-  }
-
-  // Botão para fechar modal
-  const closeBtn = document.getElementById('ai-modal-close');
-  if (closeBtn) {
-    closeBtn.addEventListener('click', closeAIModal);
-  }
-
-  // Overlay para fechar modal
-  const overlay = document.getElementById('ai-modal-overlay');
-  if (overlay) {
-    overlay.addEventListener('click', closeAIModal);
-  }
-
-  // Botão de enviar pergunta personalizada
-  const sendCustomBtn = document.getElementById('send-custom-btn');
-  if (sendCustomBtn) {
-    sendCustomBtn.addEventListener('click', () => {
-      const customQuestion = document.getElementById('custom-question');
-      if (customQuestion && customQuestion.value.trim()) {
-        processQuestion(customQuestion.value.trim());
-        customQuestion.value = '';
-      }
-    });
-  }
-
-  // Enter no textarea para enviar
-  const customQuestion = document.getElementById('custom-question');
-  if (customQuestion) {
-    customQuestion.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        const sendBtn = document.getElementById('send-custom-btn');
-        if (sendBtn) sendBtn.click();
-      }
-    });
-  }
-
-  // Seleção de texto na página
-  document.addEventListener('mouseup', handleTextSelection);
-  document.addEventListener('keyup', handleTextSelection);
-
-  // ESC para fechar modal
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      const modal = document.getElementById('ai-modal');
-      if (modal && modal.classList.contains('active')) {
-        closeAIModal();
-      }
-    }
-  });
+function setupTextSelectionListeners() {
+  document.addEventListener('mouseup', captureTextSelection);
+  document.addEventListener('keyup', captureTextSelection);
+  console.log('Event listeners de seleção de texto configurados');
 }
 
 // ============================
-// NOVAS FUNCIONALIDADES: MENU FLUTUANTE
+// GERAÇÃO AUTOMÁTICA DO SUMÁRIO
 // ============================
 
 /**
- * Alterna o menu flutuante principal
+ * Gera automaticamente o sumário baseado nos títulos da página
  */
-function toggleFloatingMenu() {
-  const submenu = document.getElementById('floating-submenu');
-  const mainBtn = document.getElementById('main-floating-btn');
+function generateTableOfContents() {
+  console.log('Gerando sumário automaticamente...');
   
-  if (!submenu || !mainBtn) return;
+  const headings = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
+  const sidebar = document.getElementById('sidebar');
   
-  isFloatingMenuOpen = !isFloatingMenuOpen;
-  
-  if (isFloatingMenuOpen) {
-    submenu.classList.add('active');
-    mainBtn.style.transform = 'rotate(45deg)';
-  } else {
-    submenu.classList.remove('active');
-    mainBtn.style.transform = 'rotate(0deg)';
-  }
-}
-
-/**
- * Fecha o menu flutuante
- */
-function closeFloatingMenu() {
-  const submenu = document.getElementById('floating-submenu');
-  const mainBtn = document.getElementById('main-floating-btn');
-  
-  if (!submenu || !mainBtn) return;
-  
-  isFloatingMenuOpen = false;
-  submenu.classList.remove('active');
-  mainBtn.style.transform = 'rotate(0deg)';
-}
-
-/**
- * Configura event listeners do menu flutuante
- */
-function setupFloatingMenuListeners() {
-  // Botão principal do menu flutuante
-  const mainBtn = document.getElementById('main-floating-btn');
-  if (mainBtn) {
-    mainBtn.addEventListener('click', toggleFloatingMenu);
-  }
-
-  // Sub-botão do assistente IA
-  const aiSubmenuBtn = document.getElementById('ai-submenu-btn');
-  if (aiSubmenuBtn) {
-    aiSubmenuBtn.addEventListener('click', () => {
-      closeFloatingMenu();
-      openAIModal();
-    });
-  }
-
-  // Sub-botão de contato
-  const contactBtn = document.getElementById('contact-btn');
-  if (contactBtn) {
-    contactBtn.addEventListener('click', () => {
-      closeFloatingMenu();
-      openContactModal();
-    });
-  }
-
-  // Sub-botão de sugestão de edição
-  const suggestEditBtn = document.getElementById('suggest-edit-btn');
-  if (suggestEditBtn) {
-    suggestEditBtn.addEventListener('click', () => {
-      closeFloatingMenu();
-      openEditModal();
-    });
-  }
-
-  // Sub-botão do GitHub
-  const githubBtn = document.getElementById('github-btn');
-  if (githubBtn) {
-    githubBtn.addEventListener('click', () => {
-      closeFloatingMenu();
-      openGitHubModal();
-    });
-  }
-
-  // Sub-botão de ferramentas
-  const toolsBtn = document.getElementById('tools-btn');
-  if (toolsBtn) {
-    toolsBtn.addEventListener('click', () => {
-      closeFloatingMenu();
-      openToolsModal();
-    });
-  }
-
-  // Sub-botão "Quero fazer parte"
-  const joinTeamBtn = document.getElementById('join-team-btn');
-  if (joinTeamBtn) {
-    joinTeamBtn.addEventListener('click', () => {
-      closeFloatingMenu();
-      openJoinTeamModal();
-    });
-  }
-
-  // Fechar menu ao clicar fora
-  document.addEventListener('click', (e) => {
-    const floatingMenu = document.getElementById('floating-menu');
-    if (floatingMenu && !floatingMenu.contains(e.target) && isFloatingMenuOpen) {
-      closeFloatingMenu();
-    }
-  });
-}
-
-// ============================
-// NOVAS FUNCIONALIDADES: MODAIS
-// ============================
-
-/**
- * Abre modal de contato
- */
-function openContactModal() {
-  const modal = document.getElementById('contact-modal');
-  const overlay = document.getElementById('modal-overlay');
-  
-  if (modal && overlay) {
-    modal.style.display = 'block';
-    overlay.style.display = 'block';
-    document.body.style.overflow = 'hidden';
-    
-    setTimeout(() => {
-      modal.classList.add('active');
-      overlay.classList.add('active');
-    }, 10);
-  }
-}
-
-/**
- * Abre modal de edição
- */
-function openEditModal() {
-  const modal = document.getElementById('edit-modal');
-  const overlay = document.getElementById('modal-overlay');
-  
-  if (modal && overlay) {
-    modal.style.display = 'block';
-    overlay.style.display = 'block';
-    document.body.style.overflow = 'hidden';
-    
-    setTimeout(() => {
-      modal.classList.add('active');
-      overlay.classList.add('active');
-    }, 10);
-  }
-}
-
-/**
- * Abre modal de sugestão via GitHub
- */
-function openGitHubModal() {
-  const modal = document.getElementById('github-modal');
-  const overlay = document.getElementById('modal-overlay');
-  
-  if (modal && overlay) {
-    // Atualiza texto selecionado no modal do GitHub
-    updateGitHubSelectedTextDisplay();
-    
-    modal.style.display = 'block';
-    overlay.style.display = 'block';
-    document.body.style.overflow = 'hidden';
-    
-    setTimeout(() => {
-      modal.classList.add('active');
-      overlay.classList.add('active');
-    }, 10);
-  }
-}
-
-/**
- * Atualiza a exibição do texto selecionado no modal do GitHub
- */
-function updateGitHubSelectedTextDisplay() {
-  const container = document.getElementById('github-selected-text-container');
-  const textDiv = document.getElementById('github-selected-text');
-  
-  if (container && textDiv) {
-    if (selectedText) {
-      textDiv.textContent = selectedText;
-      container.style.display = 'block';
-    } else {
-      container.style.display = 'none';
-    }
-  }
-}
-
-/**
- * Envia sugestão para GitHub Discussion
- */
-function sendGitHubSuggestion() {
-  const suggestionTextarea = document.getElementById('github-suggestion');
-  if (!suggestionTextarea) return;
-  
-  const suggestion = suggestionTextarea.value.trim();
-  if (!suggestion) {
-    showNotification('Por favor, digite sua sugestão.');
+  if (!sidebar || headings.length === 0) {
+    console.log('Sidebar não encontrada ou nenhum título encontrado');
     return;
   }
   
-  const pageTitle = document.title || 'Página sem título';
-  const pageUrl = window.location.href;
+  // Cria lista do sumário
+  const tocList = document.createElement('ul');
   
-  // Compila as informações
-  let compiledText = `**Sugestão de Edição**\n\n`;
-  compiledText += `**Arquivo:** ${pageTitle}\n`;
-  compiledText += `**Link:** ${pageUrl}\n\n`;
-  
-  if (selectedText) {
-    compiledText += `**Texto selecionado:**\n\`\`\`\n${selectedText}\n\`\`\`\n\n`;
-  }
-  
-  compiledText += `**Sugestão de alteração:**\n${suggestion}\n\n`;
-  compiledText += `**Fonte bibliográfica da alteração sugerida:**\n[Preencher aqui a referência no formato Vancouver e com print/foto do texto/fonte]\n\n`;
-  compiledText += `---\n*Sugestão enviada automaticamente via interface DomusMed*`;
-  
-  // Copia para área de transferência
-  copyToClipboard(compiledText);
-  
-  // Abre GitHub Discussion
-  const githubUrl = 'https://github.com/DomusMed/Materiais/discussions/1';
-  window.open(githubUrl, '_blank');
-  
-  suggestionTextarea.value = '';
-  closeAllModals();
-  showNotification('Informações copiadas! Cole no GitHub Discussion.');
-}
-
-/**
- * Abre modal "Quero fazer parte"
- */
-function openJoinTeamModal() {
-  const modal = document.getElementById('join-team-modal');
-  const overlay = document.getElementById('modal-overlay');
-  
-  if (modal && overlay) {
-    modal.style.display = 'block';
-    overlay.style.display = 'block';
-    document.body.style.overflow = 'hidden';
+  headings.forEach((heading, index) => {
+    // Cria ID único se não existir
+    if (!heading.id) {
+      heading.id = `heading-${index}`;
+    }
     
-    setTimeout(() => {
-      modal.classList.add('active');
-      overlay.classList.add('active');
-    }, 10);
-  }
-}
-
-/**
- * Controla a exibição do campo de semestre baseado no status acadêmico
- */
-function handleStatusChange() {
-  const statusSelect = document.getElementById('join-status');
-  const semesterGroup = document.getElementById('semester-group');
-  
-  if (statusSelect && semesterGroup) {
-    const isStudent = statusSelect.value === 'estudante';
-    semesterGroup.style.display = isStudent ? 'block' : 'none';
+    // Cria item da lista
+    const listItem = document.createElement('li');
+    const link = document.createElement('a');
     
-    // Limpa o valor do semestre se não for estudante
-    if (!isStudent) {
-      const semesterSelect = document.getElementById('join-semester');
-      if (semesterSelect) {
-        semesterSelect.value = '';
-      }
-    }
-  }
-}
-
-/**
- * Envia formulário "Quero fazer parte"
- */
-function sendJoinTeamForm() {
-  // Coleta os dados do formulário
-  const name = document.getElementById('join-name')?.value.trim() || '';
-  const email = document.getElementById('join-email')?.value.trim() || '';
-  const phone = document.getElementById('join-phone')?.value.trim() || '';
-  const status = document.getElementById('join-status')?.value || '';
-  const semester = document.getElementById('join-semester')?.value || '';
-  const motivation = document.getElementById('join-motivation')?.value.trim() || '';
-  
-  // Validação básica
-  if (!name || !email || !status || !motivation) {
-    showNotification('Por favor, preencha todos os campos obrigatórios.');
-    return;
-  }
-  
-  // Validação de e-mail básica
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
-    showNotification('Por favor, digite um e-mail válido.');
-    return;
-  }
-  
-  // Monta o corpo do e-mail
-  const subject = 'Quero fazer parte da DomusMed';
-  let body = `Nome completo: ${name}\n\n`;
-  body += `E-mail de contato: ${email}\n\n`;
-  body += `Telefone de contato: ${phone || 'Não informado'}\n\n`;
-  body += `Status acadêmico: ${status === 'estudante' ? 'Estudante de medicina' : 'Médico formado'}\n\n`;
-  
-  if (status === 'estudante' && semester) {
-    body += `Semestre atual: ${semester}º semestre\n\n`;
-  }
-  
-  body += `Motivação para se juntar ao projeto:\n${motivation}\n\n`;
-  body += `---\nFormulário enviado via interface DomusMed`;
-  
-  // Abre cliente de e-mail
-  const mailtoUrl = `mailto:contato@domusmed.site?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  window.location.href = mailtoUrl;
-  
-  // Limpa o formulário
-  clearJoinTeamForm();
-  closeAllModals();
-  showNotification('Cliente de e-mail aberto!');
-}
-
-/**
- * Limpa o formulário "Quero fazer parte"
- */
-function clearJoinTeamForm() {
-  const fields = ['join-name', 'join-email', 'join-phone', 'join-status', 'join-semester', 'join-motivation'];
-  fields.forEach(fieldId => {
-    const field = document.getElementById(fieldId);
-    if (field) {
-      field.value = '';
-    }
-  });
-  
-  // Esconde o campo de semestre
-  const semesterGroup = document.getElementById('semester-group');
-  if (semesterGroup) {
-    semesterGroup.style.display = 'none';
-  }
-}
-
-/**
- * Abre modal de ferramentas
- */
-function openToolsModal() {
-  const modal = document.getElementById('tools-modal');
-  const overlay = document.getElementById('modal-overlay');
-  
-  if (modal && overlay) {
-    modal.style.display = 'block';
-    overlay.style.display = 'block';
-    document.body.style.overflow = 'hidden';
+    link.href = `#${heading.id}`;
+    link.textContent = heading.textContent;
+    link.style.paddingLeft = `${(parseInt(heading.tagName.charAt(1)) - 1) * 15}px`;
     
-    setTimeout(() => {
-      modal.classList.add('active');
-      overlay.classList.add('active');
-    }, 10);
-  }
-}
-
-/**
- * Fecha todos os modais
- */
-function closeAllModals() {
-  const modals = ['contact-modal', 'edit-modal', 'github-modal', 'join-team-modal', 'tools-modal'];
-  const overlay = document.getElementById('modal-overlay');
-  
-  modals.forEach(modalId => {
-    const modal = document.getElementById(modalId);
-    if (modal) {
-      modal.classList.remove('active');
-      setTimeout(() => {
-        modal.style.display = 'none';
-      }, 300);
-    }
-  });
-  
-  if (overlay) {
-    overlay.classList.remove('active');
-    setTimeout(() => {
-      overlay.style.display = 'none';
-      document.body.style.overflow = '';
-    }, 300);
-  }
-}
-
-/**
- * Abre discussão no GitHub
- */
-function openGitHubDiscussion() {
-  const url = 'https://github.com/DomusMed/Materiais/discussions/1';
-  window.open(url, '_blank');
-  showNotification('Abrindo discussão no GitHub...');
-}
-
-/**
- * Envia e-mail de contato
- */
-function sendContactEmail() {
-  const messageTextarea = document.getElementById('contact-message');
-  if (!messageTextarea) return;
-  
-  const message = messageTextarea.value.trim();
-  if (!message) {
-    showNotification('Por favor, digite uma mensagem.');
-    return;
-  }
-  
-  const pageTitle = document.title || 'Página sem título';
-  const pageUrl = window.location.href;
-  
-  const subject = 'DomusMed - Contato';
-  const body = `Mensagem: ${message}\n\nPágina: ${pageTitle}\nLink: ${pageUrl}`;
-  
-  const mailtoUrl = `mailto:contato@domusmed.site?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  window.location.href = mailtoUrl;
-  
-  messageTextarea.value = '';
-  closeAllModals();
-  showNotification('Cliente de e-mail aberto!');
-}
-
-/**
- * Envia sugestão de edição via e-mail
- */
-function sendEditSuggestion() {
-  const messageTextarea = document.getElementById('edit-message');
-  if (!messageTextarea) return;
-  
-  const message = messageTextarea.value.trim();
-  if (!message) {
-    showNotification('Por favor, descreva sua sugestão.');
-    return;
-  }
-  
-  const pageTitle = document.title || 'Página sem título';
-  const pageUrl = window.location.href;
-  
-  const subject = 'Sugestão de edição - DomusMed';
-  let body = `Texto selecionado:\n${selectedText || 'Nenhum texto selecionado'}\n\n`;
-  body += `Sugestão de alteração:\n${message}\n\n`;
-  body += `Fonte bibliográfica da alteração sugerida:\n[Preencher aqui a referência no formato Vancouver e com print/foto do texto/fonte]\n\n`;
-  body += `Nome do usuário:\n[Preencher aqui seu nome completo]\n\n`;
-  body += `Contato do usuário (celular):\n[(xx) 9 xxxx xxxx]\n\n`;
-  body += `Contato do usuário (e-mail):\n[Preencher aqui]\n\n`;
-  body += `Página: ${pageTitle}\nLink: ${pageUrl}`;
-  
-  const mailtoUrl = `mailto:contato@domusmed.site?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  window.location.href = mailtoUrl;
-  
-  messageTextarea.value = '';
-  closeAllModals();
-  showNotification('Cliente de e-mail aberto!');
-}
-
-/**
- * Configura event listeners dos modais
- */
-function setupModalListeners() {
-  // Botões de fechar modais
-  const closeButtons = document.querySelectorAll('.modal-close');
-  closeButtons.forEach(btn => {
-    btn.addEventListener('click', closeAllModals);
-  });
-
-  // Overlay para fechar modais
-  const overlay = document.getElementById('modal-overlay');
-  if (overlay) {
-    overlay.addEventListener('click', closeAllModals);
-  }
-
-  // Botão de enviar contato
-  const sendContactBtn = document.getElementById('send-contact-btn');
-  if (sendContactBtn) {
-    sendContactBtn.addEventListener('click', sendContactEmail);
-  }
-
-  // Botão de enviar edição
-  const sendEditBtn = document.getElementById('send-edit-btn');
-  if (sendEditBtn) {
-    sendEditBtn.addEventListener('click', sendEditSuggestion);
-  }
-
-  // Botão de enviar edição via GitHub
-  const sendGitHubBtn = document.getElementById('send-github-btn');
-  if (sendGitHubBtn) {
-    sendGitHubBtn.addEventListener('click', sendGitHubSuggestion);
-  }
-
-  // Botão de fechar modal do GitHub
-  const githubModalClose = document.getElementById('github-modal-close');
-  if (githubModalClose) {
-    githubModalClose.addEventListener('click', closeAllModals);
-  }
-
-  // Botão de enviar formulário "Quero fazer parte"
-  const sendJoinTeamBtn = document.getElementById('send-join-team-btn');
-  if (sendJoinTeamBtn) {
-    sendJoinTeamBtn.addEventListener('click', sendJoinTeamForm);
-  }
-
-  // Botão de fechar modal "Quero fazer parte"
-  const joinTeamModalClose = document.getElementById('join-team-modal-close');
-  if (joinTeamModalClose) {
-    joinTeamModalClose.addEventListener('click', closeAllModals);
-  }
-
-  // Event listener para mudança de status acadêmico
-  const statusSelect = document.getElementById('join-status');
-  if (statusSelect) {
-    statusSelect.addEventListener('change', handleStatusChange);
-  }
-
-  // ESC para fechar modais
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      const activeModal = document.querySelector('.contact-modal.active, .edit-modal.active, .github-modal.active, .join-team-modal.active, .tools-modal.active');
-      if (activeModal) {
-        closeAllModals();
-      }
-    }
-  });
-}
-
-// ============================
-// NOVAS FUNCIONALIDADES: MODO ESCURO
-// ============================
-
-/**
- * Alterna modo escuro
- */
-function toggleDarkMode() {
-  isDarkMode = !isDarkMode;
-  document.body.classList.toggle('dark-mode', isDarkMode);
-  
-  // Atualiza botões de tema
-  updateThemeButtons();
-  
-  // Salva preferência
-  localStorage.setItem('darkMode', isDarkMode);
-  
-  showNotification(`Modo ${isDarkMode ? 'escuro' : 'claro'} ativado!`);
-}
-
-/**
- * Ativa modo claro
- */
-function setLightMode() {
-  isDarkMode = false;
-  document.body.classList.remove('dark-mode');
-  updateThemeButtons();
-  localStorage.setItem('darkMode', false);
-  showNotification('Modo claro ativado!');
-}
-
-/**
- * Ativa modo escuro
- */
-function setDarkMode() {
-  isDarkMode = true;
-  document.body.classList.add('dark-mode');
-  updateThemeButtons();
-  localStorage.setItem('darkMode', true);
-  showNotification('Modo escuro ativado!');
-}
-
-/**
- * Atualiza botões de tema
- */
-function updateThemeButtons() {
-  const lightBtn = document.getElementById('light-mode-btn');
-  const darkBtn = document.getElementById('dark-mode-btn');
-  
-  if (lightBtn && darkBtn) {
-    lightBtn.classList.toggle('active', !isDarkMode);
-    darkBtn.classList.toggle('active', isDarkMode);
-  }
-}
-
-/**
- * Carrega preferência de tema salva
- */
-function loadThemePreference() {
-  const savedTheme = localStorage.getItem('darkMode');
-  if (savedTheme !== null) {
-    isDarkMode = savedTheme === 'true';
-    document.body.classList.toggle('dark-mode', isDarkMode);
-    updateThemeButtons();
-  }
-}
-
-// ============================
-// NOVAS FUNCIONALIDADES: AJUSTE DE FONTE
-// ============================
-
-/**
- * Atualiza tamanho da fonte
- */
-function updateFontSize(size) {
-  currentFontSize = size;
-  document.body.style.fontSize = `${size}px`;
-  
-  // Atualiza valor exibido
-  const fontSizeValue = document.getElementById('font-size-value');
-  if (fontSizeValue) {
-    fontSizeValue.textContent = size;
-  }
-  
-  // Atualiza slider
-  const slider = document.getElementById('font-size-slider');
-  if (slider) {
-    slider.value = size;
-  }
-  
-  // Atualiza botões de preset
-  updateFontPresetButtons();
-  
-  // Salva preferência
-  localStorage.setItem('fontSize', size);
-  
-  showNotification(`Tamanho da fonte: ${size}px`);
-}
-
-/**
- * Atualiza botões de preset de fonte
- */
-function updateFontPresetButtons() {
-  const presetButtons = document.querySelectorAll('.font-preset-btn');
-  presetButtons.forEach(btn => {
-    const btnSize = parseInt(btn.getAttribute('data-size'));
-    btn.classList.toggle('active', btnSize === currentFontSize);
-  });
-}
-
-/**
- * Carrega preferência de fonte salva
- */
-function loadFontPreference() {
-  const savedSize = localStorage.getItem('fontSize');
-  if (savedSize) {
-    currentFontSize = parseInt(savedSize);
-    updateFontSize(currentFontSize);
-  }
-}
-
-/**
- * Configura event listeners das ferramentas
- */
-function setupToolsListeners() {
-  // Botões de tema
-  const lightBtn = document.getElementById('light-mode-btn');
-  const darkBtn = document.getElementById('dark-mode-btn');
-  
-  if (lightBtn) {
-    lightBtn.addEventListener('click', setLightMode);
-  }
-  
-  if (darkBtn) {
-    darkBtn.addEventListener('click', setDarkMode);
-  }
-
-  // Slider de fonte
-  const fontSlider = document.getElementById('font-size-slider');
-  if (fontSlider) {
-    fontSlider.addEventListener('input', (e) => {
-      updateFontSize(parseInt(e.target.value));
+    // Smooth scroll
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      heading.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
     });
-  }
-
-  // Botões de preset de fonte
-  const presetButtons = document.querySelectorAll('.font-preset-btn');
-  presetButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const size = parseInt(btn.getAttribute('data-size'));
-      updateFontSize(size);
-    });
+    
+    listItem.appendChild(link);
+    tocList.appendChild(listItem);
   });
+  
+  // Limpa conteúdo anterior e adiciona novo sumário
+  sidebar.innerHTML = '';
+  sidebar.appendChild(tocList);
+  
+  console.log(`Sumário gerado com ${headings.length} itens`);
 }
 
 // ============================
-// CRIAÇÃO DINÂMICA DE ELEMENTOS DE INTERFACE
+// CONTROLE DA SIDEBAR
 // ============================
 
 /**
- * Cria a barra de progresso de leitura
- */
-function createProgressBar() {
-  // Verifica se já existe
-  if (document.getElementById('progress-container')) {
-    return;
-  }
-
-  const progressContainer = document.createElement('div');
-  progressContainer.id = 'progress-container';
-  
-  const readingTime = document.createElement('div');
-  readingTime.id = 'reading-time';
-  readingTime.textContent = 'Calculando tempo...';
-  
-  const progressBar = document.createElement('div');
-  progressBar.id = 'progress-bar';
-  progressBar.textContent = '0%';
-  
-  progressContainer.appendChild(readingTime);
-  progressContainer.appendChild(progressBar);
-  
-  document.body.appendChild(progressContainer);
-  addFadeInClass(progressContainer);
-  
-  console.log('Barra de progresso criada dinamicamente');
-}
-
-/**
- * Cria o botão flutuante do sumário
+ * Cria o botão de toggle da sidebar
  */
 function createToggleButton() {
-  // Verifica se já existe
-  if (document.getElementById('toggle-btn')) {
-    return;
-  }
-
+  console.log('Criando botão de toggle da sidebar...');
+  
   const toggleBtn = document.createElement('button');
   toggleBtn.id = 'toggle-btn';
-  toggleBtn.setAttribute('aria-label', 'Abrir/Fechar Sumário');
-  toggleBtn.setAttribute('title', 'Sumário');
+  toggleBtn.setAttribute('aria-label', 'Abrir/fechar sumário');
   
   const icon = document.createElement('span');
   icon.className = 'icon';
@@ -1445,219 +603,49 @@ function createToggleButton() {
   toggleBtn.appendChild(icon);
   toggleBtn.appendChild(label);
   
+  // Event listener
+  toggleBtn.addEventListener('click', toggleSidebar);
+  
   document.body.appendChild(toggleBtn);
-  addFadeInClass(toggleBtn);
-  
-  console.log('Botão de sumário criado dinamicamente');
-  return toggleBtn;
+  console.log('Botão de toggle criado');
 }
-
-/**
- * Cria a sidebar do sumário
- */
-function createSidebar() {
-  // Verifica se já existe
-  if (document.getElementById('sidebar')) {
-    return;
-  }
-
-  const sidebar = document.createElement('div');
-  sidebar.id = 'sidebar';
-  sidebar.setAttribute('aria-label', 'Sumário da página');
-  
-  const ul = document.createElement('ul');
-  ul.id = 'lista-sumario';
-  
-  sidebar.appendChild(ul);
-  document.body.appendChild(sidebar);
-  
-  // Cria overlay para mobile
-  createSidebarOverlay();
-  
-  console.log('Sidebar criada dinamicamente');
-  return sidebar;
-}
-
-/**
- * Cria overlay para sidebar em dispositivos móveis
- */
-function createSidebarOverlay() {
-  // Verifica se já existe
-  if (document.getElementById('sidebar-overlay')) {
-    return;
-  }
-
-  const overlay = document.createElement('div');
-  overlay.id = 'sidebar-overlay';
-  overlay.setAttribute('aria-hidden', 'true');
-  
-  document.body.appendChild(overlay);
-  
-  // Adiciona evento para fechar sidebar ao clicar no overlay
-  overlay.addEventListener('click', closeSidebar);
-  
-  console.log('Overlay da sidebar criado');
-  return overlay;
-}
-
-// ============================
-// GERAÇÃO AUTOMÁTICA DO SUMÁRIO
-// ============================
-
-/**
- * Gera o sumário automaticamente baseado nos cabeçalhos da página
- */
-function generateSummary() {
-  const headers = document.querySelectorAll('h1, h2, h3, h4');
-  const lista = document.getElementById('lista-sumario');
-  
-  if (!lista) {
-    console.warn('Lista do sumário não encontrada');
-    return;
-  }
-
-  // Limpa lista existente
-  lista.innerHTML = '';
-  
-  let summaryCount = 0;
-  
-  headers.forEach((header, index) => {
-    // Pula h1 se for o título principal
-    if (header.tagName === 'H1' && index === 0) {
-      return;
-    }
-    
-    // Cria ID único se não existir
-    if (!header.id) {
-      header.id = `titulo-${index}`;
-    }
-    
-    const li = document.createElement('li');
-    const a = document.createElement('a');
-    
-    a.href = `#${header.id}`;
-    a.textContent = header.textContent.trim();
-    a.setAttribute('title', `Ir para: ${header.textContent.trim()}`);
-    
-    // Aplica indentação baseada no nível do cabeçalho
-    const level = parseInt(header.tagName.charAt(1));
-    if (level >= 1) {
-      li.style.marginLeft = `${(level - 1) * 20}px`;
-    }
-    
-    // Adiciona classe para estilização específica
-    li.className = `summary-level-${level}`;
-    
-    // Evento de clique para scroll suave
-    a.addEventListener('click', (e) => {
-      e.preventDefault();
-      scrollToElement(header);
-      
-      // Fecha sidebar em mobile após clique
-      if (isMobile()) {
-        closeSidebar();
-      }
-    });
-    
-    li.appendChild(a);
-    lista.appendChild(li);
-    summaryCount++;
-  });
-  
-  console.log(`Sumário gerado com ${summaryCount} itens`);
-}
-
-/**
- * Scroll suave para elemento
- */
-function scrollToElement(element) {
-  if (element) {
-    const offsetTop = element.offsetTop - 80; // Offset para não ficar colado no topo
-    window.scrollTo({
-      top: offsetTop,
-      behavior: 'smooth'
-    });
-  }
-}
-
-// ============================
-// CONTROLE DA SIDEBAR
-// ============================
 
 /**
  * Alterna visibilidade da sidebar
  */
 function toggleSidebar() {
   const sidebar = document.getElementById('sidebar');
-  const overlay = document.getElementById('sidebar-overlay');
+  const body = document.body;
   
   if (!sidebar) return;
   
   const isActive = sidebar.classList.contains('active');
   
   if (isActive) {
-    closeSidebar();
-  } else {
-    openSidebar();
-  }
-}
-
-/**
- * Abre a sidebar
- */
-function openSidebar() {
-  const sidebar = document.getElementById('sidebar');
-  const overlay = document.getElementById('sidebar-overlay');
-  const toggleBtn = document.getElementById('toggle-btn');
-  
-  if (sidebar) {
-    sidebar.classList.add('active');
-    sidebar.setAttribute('aria-hidden', 'false');
-  }
-  
-  if (overlay && isMobile()) {
-    overlay.classList.add('active');
-    overlay.setAttribute('aria-hidden', 'false');
-  }
-  
-  if (toggleBtn) {
-    toggleBtn.setAttribute('aria-expanded', 'true');
-  }
-  
-  // Previne scroll do body em mobile
-  if (isMobile()) {
-    document.body.style.overflow = 'hidden';
-  }
-  
-  console.log('Sidebar aberta');
-}
-
-/**
- * Fecha a sidebar
- */
-function closeSidebar() {
-  const sidebar = document.getElementById('sidebar');
-  const overlay = document.getElementById('sidebar-overlay');
-  const toggleBtn = document.getElementById('toggle-btn');
-  
-  if (sidebar) {
     sidebar.classList.remove('active');
-    sidebar.setAttribute('aria-hidden', 'true');
+    body.style.marginLeft = '';
+    console.log('Sidebar fechada');
+  } else {
+    sidebar.classList.add('active');
+    if (!isMobile()) {
+      body.style.marginLeft = '320px';
+    }
+    console.log('Sidebar aberta');
   }
+}
+
+/**
+ * Cria a sidebar
+ */
+function createSidebar() {
+  console.log('Criando sidebar...');
   
-  if (overlay) {
-    overlay.classList.remove('active');
-    overlay.setAttribute('aria-hidden', 'true');
-  }
+  const sidebar = document.createElement('div');
+  sidebar.id = 'sidebar';
+  sidebar.setAttribute('aria-label', 'Sumário da página');
   
-  if (toggleBtn) {
-    toggleBtn.setAttribute('aria-expanded', 'false');
-  }
-  
-  // Restaura scroll do body
-  document.body.style.overflow = '';
-  
-  console.log('Sidebar fechada');
+  document.body.appendChild(sidebar);
+  console.log('Sidebar criada');
 }
 
 // ============================
@@ -1665,63 +653,370 @@ function closeSidebar() {
 // ============================
 
 /**
- * Calcula e atualiza a barra de progresso de leitura
+ * Calcula tempo estimado de leitura
  */
-function updateProgress() {
-  const progressBar = document.getElementById('progress-bar');
-  const readingTimeEl = document.getElementById('reading-time');
-  
-  if (!progressBar || !readingTimeEl) return;
-  
-  // Calcula progresso do scroll
-  const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
-  const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-  const progress = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
-  const percent = Math.min(100, Math.round(progress));
-  
-  // Atualiza largura da barra
-  const containerWidth = document.getElementById('progress-container')?.offsetWidth || 0;
-  const readingTimeWidth = readingTimeEl.offsetWidth || 0;
-  const barWidth = (containerWidth - readingTimeWidth) * (percent / 100);
-  
-  progressBar.style.width = `${barWidth}px`;
-  progressBar.textContent = `${percent}%`;
-  
-  // Muda cor quando completo
-  if (percent === 100) {
-    progressBar.classList.add('complete');
-  } else {
-    progressBar.classList.remove('complete');
-  }
-  
-  // Calcula tempo restante
-  updateReadingTime(percent, readingTimeEl);
+function calculateReadingTime() {
+  const textContent = document.body.innerText || document.body.textContent || '';
+  const words = textContent.trim().split(/\s+/).length;
+  const minutes = Math.ceil(words / CONFIG.WPM);
+  return minutes;
 }
 
 /**
- * Calcula e atualiza o tempo estimado de leitura
+ * Cria a barra de progresso de leitura
  */
-function updateReadingTime(percent, readingTimeEl) {
-  // Conta palavras do conteúdo principal
-  const bodyText = document.body.innerText || document.body.textContent || '';
-  const words = bodyText.trim().split(/\s+/).length;
-  const totalMinutes = words / CONFIG.WPM;
+function createProgressBar() {
+  console.log('Criando barra de progresso de leitura...');
   
-  const minutesLeft = Math.max(0, Math.ceil(totalMinutes * (1 - percent / 100)));
-  const hours = Math.floor(minutesLeft / 60);
-  const mins = minutesLeft % 60;
+  const progressContainer = document.createElement('div');
+  progressContainer.id = 'progress-container';
   
-  let timeText = 'Tempo restante estimado: ⏳ ';
+  const readingTime = document.createElement('div');
+  readingTime.id = 'reading-time';
+  const estimatedTime = calculateReadingTime();
+  readingTime.textContent = `Tempo estimado: ${estimatedTime} min`;
   
-  if (percent === 100) {
-    timeText = 'Leitura concluída! ✅';
-  } else if (hours > 0) {
-    timeText += `${hours}h ${mins}m`;
+  const progressBar = document.createElement('div');
+  progressBar.id = 'progress-bar';
+  progressBar.textContent = '0%';
+  
+  progressContainer.appendChild(readingTime);
+  progressContainer.appendChild(progressBar);
+  
+  document.body.appendChild(progressContainer);
+  
+  console.log(`Barra de progresso criada. Tempo estimado: ${estimatedTime} minutos`);
+}
+
+/**
+ * Atualiza a barra de progresso baseada no scroll
+ */
+function updateProgressBar() {
+  const progressBar = document.getElementById('progress-bar');
+  if (!progressBar) return;
+  
+  const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+  const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+  const progress = Math.min(Math.round((scrollTop / scrollHeight) * 100), 100);
+  
+  progressBar.style.width = `${progress}%`;
+  progressBar.textContent = `${progress}%`;
+  
+  // Marca como completo quando chega a 100%
+  if (progress >= 100) {
+    progressBar.classList.add('complete');
+    progressBar.textContent = 'Concluído!';
   } else {
-    timeText += `${mins}m`;
+    progressBar.classList.remove('complete');
+  }
+}
+
+/**
+ * Configura event listeners para a barra de progresso
+ */
+function setupProgressBarListeners() {
+  const throttledUpdate = throttle(updateProgressBar, CONFIG.SCROLL_THROTTLE);
+  window.addEventListener('scroll', throttledUpdate);
+  window.addEventListener('resize', throttledUpdate);
+  console.log('Event listeners da barra de progresso configurados');
+}
+
+// ============================
+// MENU FLUTUANTE PRINCIPAL
+// ============================
+
+/**
+ * Cria o menu flutuante principal
+ */
+function createFloatingMenu() {
+  console.log('Criando menu flutuante principal...');
+  
+  const floatingMenu = document.createElement('div');
+  floatingMenu.id = 'floating-menu';
+  
+  // Botão principal
+  const mainBtn = document.createElement('button');
+  mainBtn.id = 'main-floating-btn';
+  mainBtn.innerHTML = '✨';
+  mainBtn.setAttribute('aria-label', 'Menu principal');
+  
+  // Container dos sub-botões
+  const subButtons = document.createElement('div');
+  subButtons.id = 'sub-buttons';
+  
+  // Sub-botões
+  const buttons = [
+    { id: 'ai-assistant-btn', icon: '🤖', label: 'Assistente IA' },
+    { id: 'contact-btn', icon: '📧', label: 'Contato' },
+    { id: 'edit-btn', icon: '✏️', label: 'Editar' },
+    { id: 'tools-btn', icon: '🛠️', label: 'Ferramentas' }
+  ];
+  
+  buttons.forEach(btnData => {
+    const btn = document.createElement('button');
+    btn.id = btnData.id;
+    btn.className = 'sub-btn';
+    btn.innerHTML = btnData.icon;
+    btn.setAttribute('aria-label', btnData.label);
+    subButtons.appendChild(btn);
+  });
+  
+  floatingMenu.appendChild(subButtons);
+  floatingMenu.appendChild(mainBtn);
+  
+  document.body.appendChild(floatingMenu);
+  
+  // Event listeners
+  mainBtn.addEventListener('click', toggleFloatingMenu);
+  
+  console.log('Menu flutuante principal criado');
+}
+
+/**
+ * Alterna o menu flutuante
+ */
+function toggleFloatingMenu() {
+  const mainBtn = document.getElementById('main-floating-btn');
+  const subButtons = document.getElementById('sub-buttons');
+  
+  if (!mainBtn || !subButtons) return;
+  
+  isFloatingMenuOpen = !isFloatingMenuOpen;
+  
+  if (isFloatingMenuOpen) {
+    mainBtn.classList.add('active');
+    subButtons.classList.add('active');
+  } else {
+    mainBtn.classList.remove('active');
+    subButtons.classList.remove('active');
   }
   
-  readingTimeEl.textContent = timeText;
+  console.log('Menu flutuante:', isFloatingMenuOpen ? 'aberto' : 'fechado');
+}
+
+/**
+ * Configura event listeners dos sub-botões
+ */
+function setupFloatingMenuListeners() {
+  const aiBtn = document.getElementById('ai-assistant-btn');
+  const contactBtn = document.getElementById('contact-btn');
+  const editBtn = document.getElementById('edit-btn');
+  const toolsBtn = document.getElementById('tools-btn');
+  
+  if (aiBtn) aiBtn.addEventListener('click', () => openModal('ai-modal'));
+  if (contactBtn) contactBtn.addEventListener('click', () => openModal('contact-modal'));
+  if (editBtn) editBtn.addEventListener('click', () => openModal('edit-modal'));
+  if (toolsBtn) toolsBtn.addEventListener('click', () => openModal('tools-modal'));
+  
+  console.log('Event listeners dos sub-botões configurados');
+}
+
+// ============================
+// SISTEMA DE MODAIS
+// ============================
+
+/**
+ * Abre um modal específico
+ */
+function openModal(modalId) {
+  const overlay = document.querySelector(`#${modalId} .modal-overlay`);
+  const modal = document.querySelector(`#${modalId} .modal`);
+  
+  if (!overlay || !modal) {
+    console.error(`Modal ${modalId} não encontrado`);
+    return;
+  }
+  
+  overlay.style.display = 'block';
+  modal.style.display = 'block';
+  document.body.style.overflow = 'hidden';
+  
+  setTimeout(() => {
+    overlay.classList.add('active');
+    modal.classList.add('active');
+  }, 10);
+  
+  console.log(`Modal ${modalId} aberto`);
+}
+
+/**
+ * Fecha um modal específico
+ */
+function closeModal(modalId) {
+  const overlay = document.querySelector(`#${modalId} .modal-overlay`);
+  const modal = document.querySelector(`#${modalId} .modal`);
+  
+  if (!overlay || !modal) return;
+  
+  overlay.classList.remove('active');
+  modal.classList.remove('active');
+  
+  setTimeout(() => {
+    overlay.style.display = 'none';
+    modal.style.display = 'none';
+    document.body.style.overflow = '';
+  }, 300);
+  
+  console.log(`Modal ${modalId} fechado`);
+}
+
+/**
+ * Configura event listeners dos modais
+ */
+function setupModalListeners() {
+  // Event listeners para fechar modais
+  document.addEventListener('click', (e) => {
+    if (e.target.classList.contains('modal-overlay') || e.target.classList.contains('modal-close')) {
+      const modal = e.target.closest('[id$="-modal"]');
+      if (modal) {
+        closeModal(modal.id);
+      }
+    }
+  });
+  
+  // ESC para fechar modais
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      const activeModal = document.querySelector('.modal.active');
+      if (activeModal) {
+        const modalContainer = activeModal.closest('[id$="-modal"]');
+        if (modalContainer) {
+          closeModal(modalContainer.id);
+        }
+      }
+    }
+  });
+  
+  console.log('Event listeners dos modais configurados');
+}
+
+// ============================
+// ASSISTENTE IA - FUNCIONALIDADES ESPECÍFICAS
+// ============================
+
+/**
+ * Configura o modal do assistente IA
+ */
+function setupAIAssistant() {
+  // Atualiza informações de seleção
+  const updateSelectionInfo = () => {
+    const selectionInfo = document.querySelector('#ai-modal .selection-info');
+    const selectedTextDiv = document.querySelector('#ai-modal .selected-text');
+    
+    if (selectionInfo && selectedTextDiv) {
+      if (selectedText) {
+        selectionInfo.style.display = 'block';
+        selectedTextDiv.textContent = selectedText;
+      } else {
+        selectionInfo.style.display = 'none';
+      }
+    }
+  };
+  
+  // Event listeners para seleção de plataforma
+  const platformButtons = document.querySelectorAll('#ai-modal .platform-btn');
+  platformButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      platformButtons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentPlatform = btn.dataset.platform;
+      console.log('Plataforma selecionada:', currentPlatform);
+    });
+  });
+  
+  // Event listeners para perguntas pré-formuladas
+  const questionButtons = document.querySelectorAll('#ai-modal .question-btn');
+  questionButtons.forEach((btn, index) => {
+    btn.addEventListener('click', () => {
+      const question = PREDEFINED_QUESTIONS[index].detailed;
+      openAIPlatform(currentPlatform, question);
+      closeModal('ai-modal');
+    });
+  });
+  
+  // Event listener para pergunta customizada
+  const customQuestionBtn = document.querySelector('#ai-modal .btn-primary');
+  if (customQuestionBtn) {
+    customQuestionBtn.addEventListener('click', () => {
+      const customTextarea = document.querySelector('#ai-modal .custom-question textarea');
+      if (customTextarea && customTextarea.value.trim()) {
+        openAIPlatform(currentPlatform, customTextarea.value.trim());
+        closeModal('ai-modal');
+      }
+    });
+  }
+  
+  // Atualiza informações quando o modal abre
+  const aiBtn = document.getElementById('ai-assistant-btn');
+  if (aiBtn) {
+    aiBtn.addEventListener('click', updateSelectionInfo);
+  }
+  
+  console.log('Assistente IA configurado');
+}
+
+// ============================
+// FERRAMENTAS - MODO ESCURO E FONTE
+// ============================
+
+/**
+ * Alterna modo escuro
+ */
+function toggleDarkMode() {
+  isDarkMode = !isDarkMode;
+  document.body.classList.toggle('dark-mode', isDarkMode);
+  
+  // Salva preferência
+  localStorage.setItem('darkMode', isDarkMode);
+  
+  showNotification(`Modo ${isDarkMode ? 'escuro' : 'claro'} ativado`);
+  console.log('Modo escuro:', isDarkMode ? 'ativado' : 'desativado');
+}
+
+/**
+ * Ajusta tamanho da fonte
+ */
+function adjustFontSize(change) {
+  currentFontSize += change;
+  currentFontSize = Math.max(14, Math.min(28, currentFontSize)); // Limita entre 14px e 28px
+  
+  document.body.style.fontSize = `${currentFontSize}px`;
+  
+  // Salva preferência
+  localStorage.setItem('fontSize', currentFontSize);
+  
+  showNotification(`Tamanho da fonte: ${currentFontSize}px`);
+  console.log('Tamanho da fonte ajustado para:', currentFontSize);
+}
+
+/**
+ * Configura ferramentas
+ */
+function setupTools() {
+  // Event listeners para ferramentas
+  const darkModeBtn = document.querySelector('#tools-modal [data-tool="dark-mode"]');
+  const fontIncreaseBtn = document.querySelector('#tools-modal [data-tool="font-increase"]');
+  const fontDecreaseBtn = document.querySelector('#tools-modal [data-tool="font-decrease"]');
+  
+  if (darkModeBtn) darkModeBtn.addEventListener('click', toggleDarkMode);
+  if (fontIncreaseBtn) fontIncreaseBtn.addEventListener('click', () => adjustFontSize(2));
+  if (fontDecreaseBtn) fontDecreaseBtn.addEventListener('click', () => adjustFontSize(-2));
+  
+  // Carrega preferências salvas
+  const savedDarkMode = localStorage.getItem('darkMode');
+  const savedFontSize = localStorage.getItem('fontSize');
+  
+  if (savedDarkMode === 'true') {
+    isDarkMode = true;
+    document.body.classList.add('dark-mode');
+  }
+  
+  if (savedFontSize) {
+    currentFontSize = parseInt(savedFontSize);
+    document.body.style.fontSize = `${currentFontSize}px`;
+  }
+  
+  console.log('Ferramentas configuradas');
 }
 
 // ============================
