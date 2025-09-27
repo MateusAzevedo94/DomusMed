@@ -242,12 +242,10 @@ function closeImageModal() {
 
 /**
  * Configura event listeners para imagens do corpo do texto
- * CORRIGIDO: Apenas imagens com classe .estudo-img ativam o modal
  */
 function setupImageModalListeners() {
   console.log('Configurando event listeners para imagens do corpo do texto...');
   
-  // Seleciona APENAS imagens com classe .estudo-img (não a capa)
   const estudoImages = document.querySelectorAll('.estudo-img');
   
   estudoImages.forEach((img, index) => {
@@ -1729,8 +1727,7 @@ function updateReadingTime(percent, readingTimeEl) {
 // ============================
 
 /**
- * 
-Configura todos os event listeners
+ * Configura todos os event listeners
  */
 function setupEventListeners() {
   // Botão de toggle da sidebar
@@ -1887,8 +1884,7 @@ function initializeNewFeatures() {
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', initializeApp);
 } else {
-  // DOM já 
-está pronto
+  // DOM já está pronto
   initializeApp();
 }
 
