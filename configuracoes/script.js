@@ -1929,4 +1929,3 @@ window.MedicalResumeApp = {
 };
 
 console.log('Script do modelo de resumos médicos carregado com funcionalidades de cache bust automático e modal para imagens');
-
