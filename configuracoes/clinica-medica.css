@@ -224,8 +224,8 @@ h6 + p {
   display: none;
   opacity: 0;
   transition: all 0.3s ease;
-  max-width: 95vw;
-  max-height: 95vh;
+  max-width: 99vw;
+  max-height: 99vh;
   cursor: pointer;
 }
 
@@ -239,6 +239,7 @@ h6 + p {
   max-height: 100%;
   border-radius: 8px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  object-fit: contain;
 }
 
 /* ============================
