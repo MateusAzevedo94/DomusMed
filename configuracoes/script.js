@@ -136,132 +136,130 @@ function applyCacheBustToAllImages() {
   console.log(`Cache bust aplicado em ${allImages.length} imagens`);
 }
 
-// ============================
-// MODAL PARA VISUALIZAÇÃO DE IMAGENS
-// ============================
+/* ============================
+   MODAL PARA VISUALIZAÇÃO DE IMAGENS
+   ============================ */
 
 /**
- * Cria o modal para visualização de imagens em tela cheia
+ * Cria os elementos HTML do modal de imagem e os anexa ao corpo do documento.
+ * Isso só precisa ser executado uma vez quando a página carrega.
  */
 function createImageModal() {
-  // Verifica se já existe
+  // Evita criar o modal se ele já existir
   if (document.getElementById('image-modal-overlay')) {
     return;
   }
-  
-  console.log('Criando modal para visualização de imagens...');
-  
-  // Cria overlay
+
+  // 1. Cria o overlay (fundo escuro)
   const overlay = document.createElement('div');
   overlay.id = 'image-modal-overlay';
   overlay.className = 'image-modal-overlay';
-  overlay.setAttribute('aria-label', 'Modal de visualização de imagem');
-  
-  // Cria modal
+
+  // 2. Cria o container do modal
   const modal = document.createElement('div');
   modal.id = 'image-modal';
   modal.className = 'image-modal';
-  
-  // Cria imagem do modal
+
+  // 3. Cria a tag <img> que exibirá a imagem ampliada
   const modalImg = document.createElement('img');
   modalImg.id = 'modal-image';
   modalImg.alt = 'Imagem em tela cheia';
-  
+
+  // 4. Monta a estrutura e adiciona ao body
   modal.appendChild(modalImg);
   document.body.appendChild(overlay);
   document.body.appendChild(modal);
-  
-  // Event listeners para fechar modal
+
+  // 5. Adiciona eventos para fechar o modal
   overlay.addEventListener('click', closeImageModal);
   modal.addEventListener('click', closeImageModal);
-  
-  // ESC para fechar modal
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       closeImageModal();
     }
   });
-  
-  console.log('Modal de imagem criado com sucesso');
 }
 
 /**
- * Abre o modal de visualização de imagem
+ * Abre o modal com a imagem que foi clicada.
+ * @param {string} imageSrc - O caminho (URL) da imagem a ser exibida.
+ * @param {string} imageAlt - O texto alternativo da imagem.
  */
 function openImageModal(imageSrc, imageAlt) {
   const overlay = document.getElementById('image-modal-overlay');
   const modal = document.getElementById('image-modal');
   const modalImg = document.getElementById('modal-image');
-  
+
   if (!overlay || !modal || !modalImg) {
-    console.error('Elementos do modal de imagem não encontrados');
+    console.error('Elementos do modal de imagem não encontrados.');
     return;
   }
-  
-  // Aplica cache bust na imagem do modal também
-  const timestamp = new Date().getTime();
-  const separator = imageSrc.includes('?') ? '&' : '?';
-  const cacheBustedSrc = imageSrc + separator + 't=' + timestamp;
-  
-  modalImg.src = cacheBustedSrc;
+
+  // Define a imagem e o texto alternativo no modal
+  modalImg.src = imageSrc;
   modalImg.alt = imageAlt || 'Imagem em tela cheia';
-  
-  // Mostra modal
+
+  // Mostra o modal com uma transição suave
   overlay.style.display = 'block';
   modal.style.display = 'block';
-  document.body.style.overflow = 'hidden';
-  
+  document.body.style.overflow = 'hidden'; // Impede o scroll da página ao fundo
+
   setTimeout(() => {
     overlay.classList.add('active');
     modal.classList.add('active');
-  }, 10);
-  
-  console.log('Modal de imagem aberto:', cacheBustedSrc);
+  }, 10); // Pequeno delay para garantir que a transição CSS funcione
 }
 
 /**
- * Fecha o modal de visualização de imagem
+ * Fecha o modal de imagem.
  */
 function closeImageModal() {
   const overlay = document.getElementById('image-modal-overlay');
   const modal = document.getElementById('image-modal');
-  
-  if (!overlay || !modal) return;
-  
+
+  if (!overlay || !modal || !overlay.classList.contains('active')) return;
+
+  // Remove as classes 'active' para iniciar a animação de fechamento
   overlay.classList.remove('active');
   modal.classList.remove('active');
-  
+
+  // Após a animação, esconde os elementos e restaura o scroll da página
   setTimeout(() => {
     overlay.style.display = 'none';
     modal.style.display = 'none';
     document.body.style.overflow = '';
-  }, 300);
-  
-  console.log('Modal de imagem fechado');
+  }, 300); // O tempo deve ser o mesmo da transição CSS
 }
 
 /**
- * Configura event listeners para imagens do corpo do texto
+ * Configura os eventos de clique em todas as imagens que devem abrir o modal.
+ * Procura por todas as imagens com a classe '.estudo-img'.
  */
 function setupImageModalListeners() {
-  console.log('Configurando event listeners para imagens do corpo do texto...');
-  
+  // Seleciona APENAS imagens com a classe .estudo-img
   const estudoImages = document.querySelectorAll('.estudo-img');
-  
-  estudoImages.forEach((img, index) => {
+
+  estudoImages.forEach((img) => {
     img.addEventListener('click', () => {
       openImageModal(img.src, img.alt);
     });
-    
-    // Adiciona cursor pointer e título
-    img.style.cursor = 'pointer';
+    // Adiciona um título para melhor acessibilidade
     img.title = 'Clique para visualizar em tela cheia';
+  });
+}
     
     console.log(`Event listener adicionado à imagem ${index + 1}`);
   });
   
   console.log(`Event listeners configurados para ${estudoImages.length} imagens do corpo do texto`);
 }
+
+// --- INICIALIZAÇÃO ---
+// Essas funções precisam ser chamadas para que tudo funcione.
+// Coloque isso no final do seu script ou dentro de um evento DOMContentLoaded.
+
+createImageModal();
+setupImageModalListeners();
 
 // ============================
 // DETECÇÃO DINÂMICA DE CAMINHOS
